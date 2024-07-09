@@ -77,6 +77,9 @@
     <button type="submit">Login</button>
   </form>
 
+  <!-- Sign-out Button -->
+  <button id="signout-button" style="display:none;">Sign Out</button>
+
   <div id="message"></div>
 
   <!-- Firebase App (the core Firebase SDK) -->
@@ -104,6 +107,7 @@
       const auth = firebase.auth();
 
       const messageDiv = document.getElementById('message');
+      const signoutButton = document.getElementById('signout-button');
 
       // Function to display messages
       function showMessage(message) {
@@ -115,7 +119,7 @@
       // Format and log user info
       function logUserInfo(userCredential) {
         const user = userCredential.user;
-        console.log('Login successful:', {
+        console.log('User Info:', {
           uid: user.uid,
           email: user.email,
           emailVerified: user.emailVerified,
@@ -141,6 +145,7 @@
           .then((userCredential) => {
             logUserInfo(userCredential);
             showMessage('Signup successful!');
+            signoutButton.style.display = 'block';
           })
           .catch((error) => {
             console.error('Signup error:', error);
@@ -162,11 +167,24 @@
           .then((userCredential) => {
             logUserInfo(userCredential);
             showMessage('Login successful!');
+            signoutButton.style.display = 'block';
           })
           .catch((error) => {
             console.error('Login error:', error);
             showMessage(`Error: ${error.message}`);
           });
+      });
+
+      // Handle signout
+      signoutButton.addEventListener('click', () => {
+        auth.signOut().then(() => {
+          console.log('User signed out');
+          showMessage('Signout successful!');
+          signoutButton.style.display = 'none';
+        }).catch((error) => {
+          console.error('Signout error:', error);
+          showMessage(`Error: ${error.message}`);
+        });
       });
     });
   </script>
