@@ -19,7 +19,7 @@
       color: #333;
       margin-bottom: 20px;
     }
-    form {
+    form, .auth-container {
       margin-bottom: 20px;
       padding: 20px;
       background-color: #fff;
@@ -77,6 +77,12 @@
     <button type="submit">Login</button>
   </form>
 
+  <!-- Additional Auth Options -->
+  <div class="auth-container">
+    <button id="google-signin">Sign in with Google</button>
+    <button id="phone-signin">Sign in with Phone</button>
+  </div>
+
   <!-- Sign-out Button -->
   <button id="signout-button" style="display:none;">Sign Out</button>
 
@@ -105,15 +111,28 @@
       // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
       const auth = firebase.auth();
-
+      const googleProvider = new firebase.auth.GoogleAuthProvider();
       const messageDiv = document.getElementById('message');
       const signoutButton = document.getElementById('signout-button');
+      const signupForm = document.getElementById('signup-form');
+      const loginForm = document.getElementById('login-form');
+      const googleSigninButton = document.getElementById('google-signin');
+      const phoneSigninButton = document.getElementById('phone-signin');
 
       // Function to display messages
       function showMessage(message) {
         console.log('Show message:', message);
         messageDiv.textContent = message;
         messageDiv.style.display = 'block';
+      }
+
+      // Function to show/hide forms and signout button
+      function toggleAuthUI(showAuth) {
+        signupForm.style.display = showAuth ? 'block' : 'none';
+        loginForm.style.display = showAuth ? 'block' : 'none';
+        googleSigninButton.style.display = showAuth ? 'block' : 'none';
+        phoneSigninButton.style.display = showAuth ? 'block' : 'none';
+        signoutButton.style.display = showAuth ? 'none' : 'block';
       }
 
       // Format and log user info
@@ -132,7 +151,6 @@
       }
 
       // Handle signup
-      const signupForm = document.getElementById('signup-form');
       signupForm.addEventListener('submit', (e) => {
         e.preventDefault();
         console.log('Signup form submitted');
@@ -145,7 +163,7 @@
           .then((userCredential) => {
             logUserInfo(userCredential);
             showMessage('Signup successful!');
-            signoutButton.style.display = 'block';
+            toggleAuthUI(false);
           })
           .catch((error) => {
             console.error('Signup error:', error);
@@ -154,7 +172,6 @@
       });
 
       // Handle login
-      const loginForm = document.getElementById('login-form');
       loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         console.log('Login form submitted');
@@ -167,7 +184,7 @@
           .then((userCredential) => {
             logUserInfo(userCredential);
             showMessage('Login successful!');
-            signoutButton.style.display = 'block';
+            toggleAuthUI(false);
           })
           .catch((error) => {
             console.error('Login error:', error);
@@ -175,16 +192,46 @@
           });
       });
 
+      // Handle Google Sign-In
+      googleSigninButton.addEventListener('click', () => {
+        auth.signInWithPopup(googleProvider)
+          .then((result) => {
+            logUserInfo(result);
+            showMessage('Google Sign-In successful!');
+            toggleAuthUI(false);
+          })
+          .catch((error) => {
+            console.error('Google Sign-In error:', error);
+            showMessage(`Error: ${error.message}`);
+          });
+      });
+
+      // Handle Phone Sign-In
+      phoneSigninButton.addEventListener('click', () => {
+        showMessage('Phone Sign-In not implemented yet.');
+        // TODO: Implement phone sign-in logic
+      });
+
       // Handle signout
       signoutButton.addEventListener('click', () => {
         auth.signOut().then(() => {
           console.log('User signed out');
           showMessage('Signout successful!');
-          signoutButton.style.display = 'none';
+          toggleAuthUI(true);
         }).catch((error) => {
           console.error('Signout error:', error);
           showMessage(`Error: ${error.message}`);
         });
+      });
+
+      // Monitor auth state and toggle UI accordingly
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          logUserInfo({ user });
+          toggleAuthUI(false);
+        } else {
+          toggleAuthUI(true);
+        }
       });
     });
   </script>
