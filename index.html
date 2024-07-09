@@ -8,7 +8,6 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      
       padding: 20px;
       display: flex;
       flex-direction: column;
@@ -105,6 +104,7 @@
 
     // Function to display messages
     function showMessage(message) {
+      console.log('Show message:', message);
       messageDiv.textContent = message;
       messageDiv.style.display = 'block';
     }
@@ -113,14 +113,19 @@
     const signupForm = document.getElementById('signup-form');
     signupForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      console.log('Signup form submitted');
       const email = document.getElementById('signup-email').value;
       const password = document.getElementById('signup-password').value;
+      console.log('Signup email:', email);
+      console.log('Signup password:', password);
 
       auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
+          console.log('Signup successful:', userCredential);
           showMessage('Signup successful!');
         })
         .catch((error) => {
+          console.error('Signup error:', error);
           showMessage(`Error: ${error.message}`);
         });
     });
@@ -129,14 +134,19 @@
     const loginForm = document.getElementById('login-form');
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      console.log('Login form submitted');
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
+      console.log('Login email:', email);
+      console.log('Login password:', password);
 
       auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
+          console.log('Login successful:', userCredential);
           showMessage('Login successful!');
         })
         .catch((error) => {
+          console.error('Login error:', error);
           showMessage(`Error: ${error.message}`);
         });
     });
